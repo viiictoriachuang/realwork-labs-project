@@ -1,5 +1,4 @@
 // 3rd party libraries
-import { useEffect, useState } from 'react';
 import Head from 'next/head';
 
 // Components and styles
@@ -9,28 +8,13 @@ import CityOption from '../components/CityOption';
 
 // Helpers
 import cities from '../helpers/cities';
-import { getExclusions, sampleData } from '../helpers/travel/travelRules';
-import getWeatherApiRequest from '../helpers/travel/request';
+import { getExclusions } from '../helpers/travel/travelRules';
 
-export default function Home() {
-  const initialCity = { name: '', exclusions: [] };
-  const [citiesWithExclusions, setCitiesWithExclusions] = useState<CityExclusion[]>([initialCity]);
-  useEffect(() => {
-    setCitiesWithExclusions(cities.map((city: CityConfig): CityExclusion => {
-      let exclusions:string[] = [];
-      const { type, lat, lng, name } = city;
-      // make weather request
-      const data = getWeatherApiRequest(lat, lng);
-      // const data = sampleData;
-      const {
-        current: { temp, wind_speed: windSpeed, weather },
-        alerts,
-      } = data;
-      const forecast = weather[0].main;
-      exclusions = getExclusions({ type, temp, windSpeed, forecast, alerts: alerts.length })
-      return { name, exclusions };
-    }));
-  }, []);
+type Props {
+  citiesExclusions: CityExclusion[];
+}
+
+export default function Home({ citiesExclusions }: Props) {
   return (
     <div className={styles.container}>
       <Head>
@@ -42,12 +26,38 @@ export default function Home() {
           Find your next vacation
         </h1>
         <div>
-          {citiesWithExclusions.map(({ name, exclusions }: CityExclusion): JSX.Element => (!!exclusions.length ? <CityExclusion key={name} name={name} exclusions={exclusions} /> : <CityOption key={name} name={name} />
-          ))}
-        </div>
-        <div>
+          {citiesExclusions.map(({ name, exclusions }: CityExclusion): JSX.Element => (
+            !!exclusions.length ? <CityExclusion key={name} name={name} exclusions={exclusions} /> : <CityOption key={name} name={name} />
+            )
+          )}
         </div>
       </main>
     </div>
   );
+}
+
+export async function getStaticProps() {
+  let citiesWithExclusions: CityExclusion[] = [];
+
+  const fetchData = async ({ lat, lng, type, name }: CityConfig) => {
+    const part = 'hourly,daily,minutely';
+    const apiKey = 'asdf';
+    const data = await fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lng}&exclude=${part}&appid=${apiKey}&units=imperial`);
+    const json = await data.json();
+    const { current: { temp, wind_speed: windSpeed, weather }, alerts } = json;
+    const forecast = weather[0].main;
+    const exclusions = getExclusions({ type, temp, windSpeed, forecast, alerts });
+    return citiesWithExclusions.push({ name, exclusions });
+  }
+
+  cities.forEach((city: CityConfig) => {
+    fetchData(city).catch((error) => { console.log(error) });
+  });
+
+  return {
+    props: {
+      // filter null values
+      citiesExclusions: citiesWithExclusions.filter((c) => !!c),
+    },
+  }
 }

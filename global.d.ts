@@ -1,6 +1,6 @@
 interface CityExclusion {
   name: string;
-  exclusions: string[];
+  exclusions: (string | null)[];
 }
 
 interface CityConfig {
@@ -25,10 +25,19 @@ interface Weather {
   icon: string;
 }
 
+interface Alert {
+  sender_name: string;
+  event: string;
+  start: number;
+  end: number;
+  description: string;
+  tags: string[];
+}
+
 interface CityData {
   type: CityType;
   temp: number;
   windSpeed: number;
   forecast: string;
-  alerts: number;
+  alerts?: Alert[];
 }

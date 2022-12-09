@@ -33,7 +33,7 @@ export const travelRules: TravelRule[] = [
     type: [CityType.BEACH, CityType.SKI],
     field: 'alerts',
     operator: Operator.NOT,
-    value: null,
+    value: undefined,
     exclusion: 'has weather alert',
   },
   {
