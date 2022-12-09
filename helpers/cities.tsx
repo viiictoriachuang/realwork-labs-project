@@ -1,4 +1,4 @@
-enum CityType {
+export enum CityType {
   BEACH = 'beach',
   SKI = 'ski',
 }

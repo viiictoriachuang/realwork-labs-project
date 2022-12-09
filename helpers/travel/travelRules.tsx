@@ -1,3 +1,5 @@
+import { CityType } from "../cities";
+
 enum Operator {
   LESS = 'less',
   GREATER = 'greater',
@@ -7,35 +9,35 @@ enum Operator {
 
 export const travelRules: TravelRule[] = [
   {
-    type: ['beach'],
+    type: [CityType.BEACH],
     field: 'temp',
     operator: Operator.LESS,
     value: 70,
     exclusion: 'temperature below 70',
   },
   {
-    type: ['beach'],
-    field: 'wind_speed',
+    type: [CityType.BEACH],
+    field: 'windSpeed',
     operator: Operator.GREATER,
     value: 20,
     exclusion: 'wind speed over 20mph',
   },
   {
-    type: ['beach'],
-    field: 'weather.main',
+    type: [CityType.BEACH],
+    field: 'main',
     operator: Operator.EQUALS,
     value: 'Clouds',
     exclusion: 'day is cloudy',
   },
   {
-    type: ['beach', 'ski'],
+    type: [CityType.BEACH, CityType.SKI],
     field: 'alerts',
     operator: Operator.NOT,
     value: null,
     exclusion: 'has weather alert',
   },
   {
-    type: ['ski'],
+    type: [CityType.SKI],
     field: 'temp',
     operator: Operator.GREATER,
     value: 50,
@@ -90,7 +92,7 @@ export const sampleData = {"lat": 33.44,
   "uvi": 0.89,
   "clouds": 0,
   "visibility": 10000,
-  "wind_speed": 6,
+  "wind_speed": 50,
   "wind_deg": 300,
   "weather": [
     {

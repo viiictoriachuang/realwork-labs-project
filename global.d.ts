@@ -3,18 +3,6 @@ interface CityExclusion {
   exclusions: string[];
 }
 
-enum Operator {
-  LESS = 'less',
-  GREATER = 'greater',
-  EQUALS = 'equals',
-  NOT = 'not',
-}
-
-enum CityType {
-  BEACH = 'beach',
-  SKI = 'ski',
-}
-
 interface CityConfig {
   name: string;
   lat: number;
@@ -37,19 +25,10 @@ interface Weather {
   icon: string;
 }
 
-interface Alert {
-  sender_name: string;
-  event: string;
-  start: number;
-  end: number;
-  description: string;
-  tags: string[];
-}
-
 interface CityData {
   type: CityType;
   temp: number;
   windSpeed: number;
-  weather: Weather[];
-  alerts: Alert[];
+  forecast: string;
+  alerts: number;
 }

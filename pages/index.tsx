@@ -20,13 +20,14 @@ export default function Home() {
       let exclusions:string[] = [];
       const { type, lat, lng, name } = city;
       // make weather request
-      // const data = getWeatherApiRequest(lat, lng);
-      const data = sampleData;
+      const data = getWeatherApiRequest(lat, lng);
+      // const data = sampleData;
       const {
         current: { temp, wind_speed: windSpeed, weather },
         alerts,
       } = data;
-      exclusions = getExclusions({ type, temp, windSpeed, weather, alerts })
+      const forecast = weather[0].main;
+      exclusions = getExclusions({ type, temp, windSpeed, forecast, alerts: alerts.length })
       return { name, exclusions };
     }));
   }, []);
