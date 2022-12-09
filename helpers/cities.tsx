@@ -1,3 +1,8 @@
+enum CityType {
+  BEACH = 'beach',
+  SKI = 'ski',
+}
+
 const cities: CityConfig[] = [{
   name: 'Miami, FL',
   lat: 25.7617,

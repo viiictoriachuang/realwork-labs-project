@@ -23,9 +23,33 @@ interface CityConfig {
 }
 
 interface TravelRule {
-  cityType: string[];
+  type: string[];
   field: string;
   operator: Operator;
   value: string | number | null;
   exclusion: string;
+}
+
+interface Weather {
+  id: number;
+  main: string;
+  description: string;
+  icon: string;
+}
+
+interface Alert {
+  sender_name: string;
+  event: string;
+  start: number;
+  end: number;
+  description: string;
+  tags: string[];
+}
+
+interface CityData {
+  type: CityType;
+  temp: number;
+  windSpeed: number;
+  weather: Weather[];
+  alerts: Alert[];
 }
