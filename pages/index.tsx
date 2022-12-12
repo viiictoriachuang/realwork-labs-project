@@ -9,12 +9,26 @@ import CityOption from '../components/CityOption';
 // Helpers
 import cities from '../helpers/cities';
 import { getExclusions } from '../helpers/travel/travelRules';
+import { useEffect, useState } from 'react';
+import getWeatherRequest from '../helpers/travel/request';
 
-type Props {
+type Props = {
   citiesExclusions: CityExclusion[];
 }
 
 export default function Home({ citiesExclusions }: Props) {
+  const [userTemp, setUserTemp] = useState(null);
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(async (position) => {
+        const { coords: { latitude, longitude } } = position;
+        const part = 'hourly,daily,minutely,alerts';
+        const json = await getWeatherRequest({ part, lat: latitude, lon: longitude });
+        const { current: { temp } } = json;
+        setUserTemp(temp);
+      });
+    }
+  }, []);
   return (
     <div className={styles.container}>
       <Head>
@@ -22,12 +36,17 @@ export default function Home({ citiesExclusions }: Props) {
       </Head>
 
       <main className={styles.main}>
+        <div>
+          Your current temperature: {userTemp}
+        </div>
         <h1 className={styles.title}>
           Find your next vacation
         </h1>
         <div>
           {citiesExclusions.map(({ name, exclusions }: CityExclusion): JSX.Element => (
-            !!exclusions.length ? <CityExclusion key={name} name={name} exclusions={exclusions} /> : <CityOption key={name} name={name} />
+            !!exclusions.length ?
+              <CityExclusion key={name} name={name} exclusions={exclusions} /> :
+              <CityOption key={name} name={name} />
             )
           )}
         </div>
@@ -37,27 +56,19 @@ export default function Home({ citiesExclusions }: Props) {
 }
 
 export async function getStaticProps() {
-  let citiesWithExclusions: CityExclusion[] = [];
-
-  const fetchData = async ({ lat, lng, type, name }: CityConfig) => {
+  const result = cities.map(async (city: CityConfig) => {
+    const { lat, lng, type, name } = city;
     const part = 'hourly,daily,minutely';
-    const apiKey = 'asdf';
-    const data = await fetch(`https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lng}&exclude=${part}&appid=${apiKey}&units=imperial`);
-    const json = await data.json();
+    const json = await getWeatherRequest({ part, lat, lon: lng });
     const { current: { temp, wind_speed: windSpeed, weather }, alerts } = json;
     const forecast = weather[0].main;
     const exclusions = getExclusions({ type, temp, windSpeed, forecast, alerts });
-    return citiesWithExclusions.push({ name, exclusions });
-  }
-
-  cities.forEach((city: CityConfig) => {
-    fetchData(city).catch((error) => { console.log(error) });
+    return { name, exclusions };
   });
 
   return {
     props: {
-      // filter null values
-      citiesExclusions: citiesWithExclusions.filter((c) => !!c),
+      citiesExclusions: await Promise.all(result),
     },
   }
 }
