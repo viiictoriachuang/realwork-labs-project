@@ -3,8 +3,7 @@ import Head from 'next/head';
 
 // Components and styles
 import styles from '../styles/Home.module.css';
-import CityExclusion from '../components/CityExclusion';
-import CityOption from '../components/CityOption';
+import CityCard from '../components/CityCard';
 
 // Helpers
 import cities from '../helpers/cities';
@@ -17,7 +16,8 @@ type Props = {
 }
 
 export default function Home({ citiesExclusions }: Props) {
-  const [userTemp, setUserTemp] = useState(null);
+  const [userTemp, setUserTemp] = useState<number | null>(null);
+
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(async (position) => {
@@ -29,6 +29,7 @@ export default function Home({ citiesExclusions }: Props) {
       });
     }
   }, []);
+
   return (
     <div className={styles.container}>
       <Head>
@@ -36,18 +37,16 @@ export default function Home({ citiesExclusions }: Props) {
       </Head>
 
       <main className={styles.main}>
-        <div>
+        <div className="nav-right">
           Your current temperature: {userTemp}
         </div>
         <h1 className={styles.title}>
           Find your next vacation
         </h1>
-        <div>
-          {citiesExclusions.map(({ name, exclusions }: CityExclusion): JSX.Element => (
-            !!exclusions.length ?
-              <CityExclusion key={name} name={name} exclusions={exclusions} /> :
-              <CityOption key={name} name={name} />
-            )
+        <div className="d-flex flex-wrap">
+          {citiesExclusions.map(({ name, exclusions, type }: CityExclusion): JSX.Element => (
+            <CityCard key={name} name={name} exclusions={exclusions} type={type} />
+          )
           )}
         </div>
       </main>
@@ -63,7 +62,7 @@ export async function getStaticProps() {
     const { current: { temp, wind_speed: windSpeed, weather }, alerts } = json;
     const forecast = weather[0].main;
     const exclusions = getExclusions({ type, temp, windSpeed, forecast, alerts });
-    return { name, exclusions };
+    return { name, exclusions, type };
   });
 
   return {

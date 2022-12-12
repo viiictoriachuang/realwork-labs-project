@@ -1,6 +1,7 @@
 interface CityExclusion {
   name: string;
   exclusions: (string | null)[];
+  type: CityType;
 }
 
 interface CityConfig {
@@ -14,7 +15,7 @@ interface TravelRule {
   type: string[];
   field: string;
   operator: Operator;
-  value: string | number | null;
+  value: string | number | undefined;
   exclusion: string;
 }
 

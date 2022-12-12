@@ -17,11 +17,3 @@ npm run dev
 ```
 
 And the app will be accessible at [http://localhost:3000](http://localhost:3000).
-
-## Testing
-
-This app uses React Testing Library and Jest. To run tests, run
-
-```bash
-npm run test
-```
