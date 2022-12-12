@@ -1,4 +1,4 @@
-# Today's top memes
+# Top travel destinations
 
 This app is built with Next.js bootstrapped with `create-next-app`. The homepage displays a list of travel destinations marked with any weather-related reasons it would not be an option for travel.
 
